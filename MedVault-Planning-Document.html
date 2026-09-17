@@ -1,0 +1,2151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedVault — Medical Records App: Full Plan</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.0/mermaid.min.js"></script>
+<style>
+  :root {
+    --bg: #ffffff;
+    --text: #1c1f24;
+    --muted: #5b6470;
+    --accent: #0f7a6b;
+    --accent-dark: #0b5c50;
+    --border: #e2e6ea;
+    --code-bg: #f6f8fa;
+    --sidebar-bg: #f7f9f8;
+    --table-head: #eef4f2;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.65;
+  }
+  .layout {
+    display: flex;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  nav.sidebar {
+    width: 300px;
+    flex-shrink: 0;
+    padding: 32px 20px;
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  nav.sidebar h2 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin: 0 0 14px 0;
+  }
+  nav.sidebar ul { list-style: none; padding-left: 0; margin: 0; }
+  nav.sidebar ul ul { padding-left: 16px; }
+  nav.sidebar li { margin: 4px 0; }
+  nav.sidebar a {
+    color: var(--text);
+    text-decoration: none;
+    font-size: 13.5px;
+    display: block;
+    padding: 3px 6px;
+    border-radius: 5px;
+  }
+  nav.sidebar a:hover { background: #e6efec; color: var(--accent-dark); }
+  main {
+    flex: 1;
+    padding: 48px 56px 100px;
+    min-width: 0;
+    max-width: 900px;
+  }
+  .doc-header {
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 3px solid var(--accent);
+  }
+  .doc-header .eyebrow {
+    color: var(--accent);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 12.5px;
+  }
+  .doc-header h1 { font-size: 30px; margin: 8px 0 4px; }
+  .doc-header .subtitle { color: var(--muted); font-size: 15px; }
+  h1 { font-size: 26px; margin-top: 52px; color: var(--accent-dark); scroll-margin-top: 20px; }
+  h2 { font-size: 22px; margin-top: 44px; padding-top: 8px; border-top: 1px solid var(--border); color: var(--accent-dark); scroll-margin-top: 20px; }
+  h3 { font-size: 18px; margin-top: 30px; scroll-margin-top: 20px; }
+  h4 { font-size: 15.5px; margin-top: 22px; color: var(--muted); }
+  p { margin: 12px 0; }
+  a { color: var(--accent-dark); }
+  hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+    font-size: 14px;
+    box-shadow: var(--shadow);
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 9px 12px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th { background: var(--table-head); font-weight: 600; }
+  tr:nth-child(even) td { background: #fbfcfc; }
+  code {
+    background: var(--code-bg);
+    padding: 2px 5px;
+    border-radius: 4px;
+    font-family: "SF Mono", Consolas, Menlo, monospace;
+    font-size: 0.9em;
+  }
+  pre {
+    background: var(--code-bg);
+    padding: 16px 18px;
+    border-radius: 8px;
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    font-size: 13.2px;
+    line-height: 1.55;
+  }
+  pre code { background: none; padding: 0; }
+  .codehilite { margin: 16px 0; border-radius: 8px; overflow-x: auto; border: 1px solid var(--border); }
+  .codehilite pre { border: none; margin: 0; }
+  blockquote {
+    border-left: 4px solid var(--accent);
+    margin: 16px 0;
+    padding: 4px 18px;
+    color: var(--muted);
+    background: #f7faf9;
+  }
+  ul, ol { padding-left: 26px; }
+  li { margin: 4px 0; }
+  .mermaid {
+    background: #fbfcfc;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+    overflow-x: auto;
+    display: flex;
+    justify-content: center;
+  }
+  .toc-toggle { display: none; }
+  footer.doc-footer {
+    margin-top: 60px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12.5px;
+  }
+  @media (max-width: 900px) {
+    nav.sidebar { display: none; }
+    main { padding: 28px 20px 80px; max-width: 100%; }
+  }
+  @media print {
+    nav.sidebar { display: none; }
+    main { max-width: 100%; padding: 0; }
+    .mermaid { break-inside: avoid; }
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #121615;
+      --text: #e7ece9;
+      --muted: #a9b5b0;
+      --accent: #43c7b0;
+      --accent-dark: #7de0ce;
+      --border: #34413d;
+      --code-bg: #1b2421;
+      --sidebar-bg: #18201e;
+      --table-head: #22332f;
+      --shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+    }
+    nav.sidebar a:hover { background: #263b35; color: var(--accent-dark); }
+    tr:nth-child(even) td { background: #18201e; }
+    blockquote { background: #1b2925; }
+    .mermaid { background: #18201e; }
+    .codehilite { background: #1b2421; }
+    .codehilite .hll { background-color: #39452d; }
+    .codehilite .c,
+    .codehilite .ch,
+    .codehilite .cm,
+    .codehilite .c1,
+    .codehilite .cs { color: #7fc4b7; }
+    .codehilite .k,
+    .codehilite .kc,
+    .codehilite .kd,
+    .codehilite .kn,
+    .codehilite .kr,
+    .codehilite .ow { color: #7de0ce; }
+    .codehilite .s,
+    .codehilite .sa,
+    .codehilite .sb,
+    .codehilite .sc,
+    .codehilite .dl,
+    .codehilite .sd,
+    .codehilite .s2,
+    .codehilite .se,
+    .codehilite .sh,
+    .codehilite .si,
+    .codehilite .s1 { color: #9bc9ff; }
+    .codehilite .nf,
+    .codehilite .fm { color: #b7c8ff; }
+    .codehilite .nt { color: #9fc5ff; }
+    .codehilite .err { border-color: #ff7b72; }
+    .codehilite .gh { color: #b7c8ff; }
+  }
+pre { line-height: 125%; }
+td.linenos .normal { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.codehilite .hll { background-color: #ffffcc }
+.codehilite { background: #f0f0f0; }
+.codehilite .c { color: #60A0B0; font-style: italic } /* Comment */
+.codehilite .err { border: 1px solid #F00 } /* Error */
+.codehilite .k { color: #007020; font-weight: bold } /* Keyword */
+.codehilite .o { color: #666 } /* Operator */
+.codehilite .ch { color: #60A0B0; font-style: italic } /* Comment.Hashbang */
+.codehilite .cm { color: #60A0B0; font-style: italic } /* Comment.Multiline */
+.codehilite .cp { color: #007020 } /* Comment.Preproc */
+.codehilite .cpf { color: #60A0B0; font-style: italic } /* Comment.PreprocFile */
+.codehilite .c1 { color: #60A0B0; font-style: italic } /* Comment.Single */
+.codehilite .cs { color: #60A0B0; background-color: #FFF0F0 } /* Comment.Special */
+.codehilite .gd { color: #A00000 } /* Generic.Deleted */
+.codehilite .ge { font-style: italic } /* Generic.Emph */
+.codehilite .ges { font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.codehilite .gr { color: #F00 } /* Generic.Error */
+.codehilite .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.codehilite .gi { color: #00A000 } /* Generic.Inserted */
+.codehilite .go { color: #888 } /* Generic.Output */
+.codehilite .gp { color: #C65D09; font-weight: bold } /* Generic.Prompt */
+.codehilite .gs { font-weight: bold } /* Generic.Strong */
+.codehilite .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.codehilite .gt { color: #04D } /* Generic.Traceback */
+.codehilite .kc { color: #007020; font-weight: bold } /* Keyword.Constant */
+.codehilite .kd { color: #007020; font-weight: bold } /* Keyword.Declaration */
+.codehilite .kn { color: #007020; font-weight: bold } /* Keyword.Namespace */
+.codehilite .kp { color: #007020 } /* Keyword.Pseudo */
+.codehilite .kr { color: #007020; font-weight: bold } /* Keyword.Reserved */
+.codehilite .kt { color: #902000 } /* Keyword.Type */
+.codehilite .m { color: #40A070 } /* Literal.Number */
+.codehilite .s { color: #4070A0 } /* Literal.String */
+.codehilite .na { color: #4070A0 } /* Name.Attribute */
+.codehilite .nb { color: #007020 } /* Name.Builtin */
+.codehilite .nc { color: #0E84B5; font-weight: bold } /* Name.Class */
+.codehilite .no { color: #60ADD5 } /* Name.Constant */
+.codehilite .nd { color: #555; font-weight: bold } /* Name.Decorator */
+.codehilite .ni { color: #D55537; font-weight: bold } /* Name.Entity */
+.codehilite .ne { color: #007020 } /* Name.Exception */
+.codehilite .nf { color: #06287E } /* Name.Function */
+.codehilite .nl { color: #002070; font-weight: bold } /* Name.Label */
+.codehilite .nn { color: #0E84B5; font-weight: bold } /* Name.Namespace */
+.codehilite .nt { color: #062873; font-weight: bold } /* Name.Tag */
+.codehilite .nv { color: #BB60D5 } /* Name.Variable */
+.codehilite .ow { color: #007020; font-weight: bold } /* Operator.Word */
+.codehilite .w { color: #BBB } /* Text.Whitespace */
+.codehilite .mb { color: #40A070 } /* Literal.Number.Bin */
+.codehilite .mf { color: #40A070 } /* Literal.Number.Float */
+.codehilite .mh { color: #40A070 } /* Literal.Number.Hex */
+.codehilite .mi { color: #40A070 } /* Literal.Number.Integer */
+.codehilite .mo { color: #40A070 } /* Literal.Number.Oct */
+.codehilite .sa { color: #4070A0 } /* Literal.String.Affix */
+.codehilite .sb { color: #4070A0 } /* Literal.String.Backtick */
+.codehilite .sc { color: #4070A0 } /* Literal.String.Char */
+.codehilite .dl { color: #4070A0 } /* Literal.String.Delimiter */
+.codehilite .sd { color: #4070A0; font-style: italic } /* Literal.String.Doc */
+.codehilite .s2 { color: #4070A0 } /* Literal.String.Double */
+.codehilite .se { color: #4070A0; font-weight: bold } /* Literal.String.Escape */
+.codehilite .sh { color: #4070A0 } /* Literal.String.Heredoc */
+.codehilite .si { color: #70A0D0; font-style: italic } /* Literal.String.Interpol */
+.codehilite .sx { color: #C65D09 } /* Literal.String.Other */
+.codehilite .sr { color: #235388 } /* Literal.String.Regex */
+.codehilite .s1 { color: #4070A0 } /* Literal.String.Single */
+.codehilite .ss { color: #517918 } /* Literal.String.Symbol */
+.codehilite .bp { color: #007020 } /* Name.Builtin.Pseudo */
+.codehilite .fm { color: #06287E } /* Name.Function.Magic */
+.codehilite .vc { color: #BB60D5 } /* Name.Variable.Class */
+.codehilite .vg { color: #BB60D5 } /* Name.Variable.Global */
+.codehilite .vi { color: #BB60D5 } /* Name.Variable.Instance */
+.codehilite .vm { color: #BB60D5 } /* Name.Variable.Magic */
+.codehilite .il { color: #40A070 } /* Literal.Number.Integer.Long */
+@media (prefers-color-scheme: dark) {
+  .codehilite .hll { background-color: #39452d; }
+  .codehilite .c,
+  .codehilite .ch,
+  .codehilite .cm,
+  .codehilite .c1,
+  .codehilite .cs { color: #7fc4b7; }
+  .codehilite .k,
+  .codehilite .kc,
+  .codehilite .kd,
+  .codehilite .kn,
+  .codehilite .kr,
+  .codehilite .ow { color: #7de0ce; }
+  .codehilite .s,
+  .codehilite .sa,
+  .codehilite .sb,
+  .codehilite .sc,
+  .codehilite .dl,
+  .codehilite .sd,
+  .codehilite .s2,
+  .codehilite .se,
+  .codehilite .sh,
+  .codehilite .si,
+  .codehilite .s1 { color: #9bc9ff; }
+  .codehilite .nf,
+  .codehilite .fm { color: #b7c8ff; }
+  .codehilite .nt { color: #9fc5ff; }
+  .codehilite .err { border-color: #ff7b72; }
+  .codehilite .gh { color: #b7c8ff; }
+}
+
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="sidebar">
+    <h2>Contents</h2>
+    <div class="toc"><span class="toctitle">Contents</span><ul>
+<li><a href="#medvault-patient-medical-records-management-system">MedVault — Patient Medical Records Management System</a><ul>
+<li><a href="#full-product-engineering-plan-brd-architecture-database-apis-security-deployment">Full Product &amp; Engineering Plan (BRD, Architecture, Database, APIs, Security, Deployment)</a></li>
+<li><a href="#1-business-requirements-document-brd">1. Business Requirements Document (BRD)</a><ul>
+<li><a href="#11-purpose">1.1 Purpose</a></li>
+<li><a href="#12-goals">1.2 Goals</a></li>
+<li><a href="#13-stakeholders">1.3 Stakeholders</a></li>
+<li><a href="#14-scope">1.4 Scope</a></li>
+<li><a href="#15-functional-requirements">1.5 Functional Requirements</a></li>
+<li><a href="#16-non-functional-requirements">1.6 Non-Functional Requirements</a></li>
+<li><a href="#17-assumptions-constraints">1.7 Assumptions &amp; Constraints</a></li>
+<li><a href="#18-success-metrics">1.8 Success Metrics</a></li>
+</ul>
+</li>
+<li><a href="#2-high-level-system-architecture">2. High-Level System Architecture</a><ul>
+<li><a href="#key-architectural-decisions">Key architectural decisions</a></li>
+</ul>
+</li>
+<li><a href="#3-complete-application-flow">3. Complete Application Flow</a><ul>
+<li><a href="#31-user-registration-login">3.1 User Registration &amp; Login</a></li>
+<li><a href="#32-upload-a-medical-record">3.2 Upload a Medical Record</a></li>
+<li><a href="#33-view-download-a-record">3.3 View / Download a Record</a></li>
+<li><a href="#34-share-a-record">3.4 Share a Record</a></li>
+<li><a href="#35-multi-profile-dependents-flow-phase-2">3.5 Multi-Profile (Dependents) Flow — Phase 2</a></li>
+</ul>
+</li>
+<li><a href="#4-database-design-postgresql">4. Database Design (PostgreSQL)</a><ul>
+<li><a href="#41-entity-relationship-diagram">4.1 Entity Relationship Diagram</a></li>
+<li><a href="#42-ddl-core-tables">4.2 DDL (core tables)</a></li>
+</ul>
+</li>
+<li><a href="#5-api-structure-endpoints">5. API Structure &amp; Endpoints</a><ul>
+<li><a href="#51-auth">5.1 Auth</a></li>
+<li><a href="#52-users-profiles">5.2 Users &amp; Profiles</a></li>
+<li><a href="#53-categories-tags">5.3 Categories &amp; Tags</a></li>
+<li><a href="#54-medical-records">5.4 Medical Records</a></li>
+<li><a href="#55-sharing">5.5 Sharing</a></li>
+<li><a href="#56-notifications">5.6 Notifications</a></li>
+<li><a href="#57-admin-roleadmin">5.7 Admin (role=ADMIN)</a></li>
+<li><a href="#58-sample-requestresponse">5.8 Sample request/response</a></li>
+</ul>
+</li>
+<li><a href="#6-spring-boot-backend-architecture">6. Spring Boot Backend Architecture</a><ul>
+<li><a href="#61-modulepackage-structure-single-deployable-modular-monolith-recommended-for-mvp">6.1 Module/package structure (single deployable, modular monolith — recommended for MVP)</a></li>
+<li><a href="#62-key-technology-choices">6.2 Key technology choices</a></li>
+<li><a href="#63-security-filter-chain-conceptual">6.3 Security filter chain (conceptual)</a></li>
+<li><a href="#64-ownershipauthorization-pattern">6.4 Ownership/authorization pattern</a></li>
+<li><a href="#65-growth-path-modular-monolith-microservices">6.5 Growth path: modular monolith → microservices</a></li>
+</ul>
+</li>
+<li><a href="#7-reactjs-frontend-architecture">7. React.js Frontend Architecture</a><ul>
+<li><a href="#71-tech-stack">7.1 Tech stack</a></li>
+<li><a href="#72-folder-structure">7.2 Folder structure</a></li>
+<li><a href="#73-core-ux-screens">7.3 Core UX screens</a></li>
+<li><a href="#74-security-practices-on-frontend">7.4 Security practices on frontend</a></li>
+</ul>
+</li>
+<li><a href="#8-minio-integration-details">8. MinIO Integration Details</a><ul>
+<li><a href="#81-bucket-design">8.1 Bucket design</a></li>
+<li><a href="#82-presigned-url-flow-already-shown-in-sequence-diagrams">8.2 Presigned URL flow (already shown in sequence diagrams)</a></li>
+<li><a href="#83-virusmalware-scanning">8.3 Virus/malware scanning</a></li>
+<li><a href="#84-minio-deployment">8.4 MinIO deployment</a></li>
+</ul>
+</li>
+<li><a href="#9-authentication-authorization">9. Authentication &amp; Authorization</a><ul>
+<li><a href="#91-authentication">9.1 Authentication</a></li>
+<li><a href="#92-authorization-rbac-ownership">9.2 Authorization (RBAC + ownership)</a></li>
+<li><a href="#93-share-link-security">9.3 Share-link security</a></li>
+</ul>
+</li>
+<li><a href="#10-security-considerations-cross-cutting">10. Security Considerations (Cross-Cutting)</a></li>
+<li><a href="#11-additional-components-for-a-production-ready-system">11. Additional Components for a Production-Ready System</a></li>
+<li><a href="#12-deployment-architecture">12. Deployment Architecture</a><ul>
+<li><a href="#121-environments">12.1 Environments</a></li>
+<li><a href="#122-docker-compose-local-dev-conceptual">12.2 Docker Compose (local dev) — conceptual</a></li>
+<li><a href="#123-production-topology-kubernetes-conceptual">12.3 Production topology (Kubernetes, conceptual)</a></li>
+</ul>
+</li>
+<li><a href="#13-suggested-build-roadmap">13. Suggested Build Roadmap</a></li>
+<li><a href="#14-summary-of-key-recommendations">14. Summary of Key Recommendations</a></li>
+</ul>
+</li>
+</ul>
+</div>
+
+  </nav>
+  <main>
+    <div class="doc-header">
+      <div class="eyebrow">Product &amp; Engineering Plan</div>
+      <h1>MedVault — Patient Medical Records Management System</h1>
+      <div class="subtitle">BRD · Architecture · Database Schema · APIs · Security · Deployment</div>
+    </div>
+    <h1 id="medvault-patient-medical-records-management-system">MedVault — Patient Medical Records Management System</h1>
+<h3 id="full-product-engineering-plan-brd-architecture-database-apis-security-deployment">Full Product &amp; Engineering Plan (BRD, Architecture, Database, APIs, Security, Deployment)</h3>
+<hr />
+<h2 id="1-business-requirements-document-brd">1. Business Requirements Document (BRD)</h2>
+<h3 id="11-purpose">1.1 Purpose</h3>
+<p>Build a secure web application ("MedVault") that lets patients upload, organize, and manage their personal medical documents — prescriptions, lab reports, X-ray/imaging reports, discharge summaries, vaccination records, insurance documents, etc. — in one place, and optionally share them with doctors or family members.</p>
+<h3 id="12-goals">1.2 Goals</h3>
+<ul>
+<li>Give patients a single, secure, searchable repository for all medical documents.</li>
+<li>Reduce dependency on physical paperwork and fragmented storage (WhatsApp, email, phone gallery).</li>
+<li>Allow structured tagging (document type, date, doctor, hospital, tags) for fast retrieval.</li>
+<li>Allow controlled, time-boxed sharing of records with third parties (doctor, family member, insurer) via secure links.</li>
+<li>Be compliant with data-privacy best practices comparable to HIPAA/GDPR principles even if not formally certified initially.</li>
+</ul>
+<h3 id="13-stakeholders">1.3 Stakeholders</h3>
+<table>
+<thead>
+<tr>
+<th>Stakeholder</th>
+<th>Interest</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Patient (primary user)</td>
+<td>Upload, view, organize, share, delete own records</td>
+</tr>
+<tr>
+<td>Doctor (secondary user, optional in v1)</td>
+<td>View records shared with them</td>
+</tr>
+<tr>
+<td>Family member / Caregiver (optional)</td>
+<td>View/manage records for a dependent (e.g., child, elderly parent)</td>
+</tr>
+<tr>
+<td>Admin</td>
+<td>User management, system monitoring, compliance audits</td>
+</tr>
+<tr>
+<td>System</td>
+<td>Automated OCR/tagging, reminders (prescription refill, report follow-up)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="14-scope">1.4 Scope</h3>
+<p><strong>In scope — MVP (Phase 1)</strong>
+- Patient registration/login (email + password, OTP-based email verification)
+- Upload documents (PDF, JPG, PNG, DOCX up to a size limit)
+- Categorize by type: Prescription, Lab Report, X-ray/Imaging, Discharge Summary, Vaccination, Insurance, Other
+- Metadata: title, doctor name, hospital/clinic, date of record, tags, notes
+- View, download, rename, delete, search, filter, sort records
+- Folder/category-based organization
+- Basic dashboard (recent uploads, storage used, record counts by category)
+- Secure file storage (MinIO, S3-compatible) with encryption at rest
+- Audit log of access/uploads/downloads
+- Responsive web UI (desktop + mobile browser)</p>
+<p><strong>In scope — Phase 2</strong>
+- Share a record (or set of records) with a doctor/family member via expiring secure link or invited account
+- Multi-profile support (manage records for dependents under one account)
+- OCR text extraction from scanned reports + full-text search
+- Reminders/notifications (medicine refill, follow-up visit, report expiry)
+- Mobile app (React Native) reusing the same APIs</p>
+<p><strong>In scope — Phase 3</strong>
+- Doctor-side portal (view shared records, add notes)
+- Integration with lab/hospital APIs (auto-import reports) — e.g. HL7/FHIR
+- Analytics/health trends dashboard (e.g., blood pressure/sugar trend from lab reports)
+- Two-factor authentication (TOTP), biometric login on mobile</p>
+<p><strong>Out of scope (for now)</strong>
+- Direct EHR/insurance claim integrations
+- Telemedicine / video consultation
+- Prescription e-ordering to pharmacy</p>
+<h3 id="15-functional-requirements">1.5 Functional Requirements</h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Requirement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FR-1</td>
+<td>Users can register, verify email, log in, log out, reset password</td>
+</tr>
+<tr>
+<td>FR-2</td>
+<td>Users can upload one or more files with metadata in a single action</td>
+</tr>
+<tr>
+<td>FR-3</td>
+<td>Users can view a list/grid of their records with thumbnails/previews</td>
+</tr>
+<tr>
+<td>FR-4</td>
+<td>Users can search records by title, tag, doctor, category, date range</td>
+</tr>
+<tr>
+<td>FR-5</td>
+<td>Users can download the original file or view it inline (PDF/image viewer)</td>
+</tr>
+<tr>
+<td>FR-6</td>
+<td>Users can edit metadata or delete a record (soft delete with recovery window)</td>
+</tr>
+<tr>
+<td>FR-7</td>
+<td>Users can create/manage family member profiles and switch between them</td>
+</tr>
+<tr>
+<td>FR-8</td>
+<td>Users can generate a shareable, expiring, revocable link for a record or record set</td>
+</tr>
+<tr>
+<td>FR-9</td>
+<td>System logs every access/download/share event per record (audit trail)</td>
+</tr>
+<tr>
+<td>FR-10</td>
+<td>System enforces per-user storage quota and shows usage</td>
+</tr>
+<tr>
+<td>FR-11</td>
+<td>Admin can view system health, manage users, and review flagged activity</td>
+</tr>
+</tbody>
+</table>
+<h3 id="16-non-functional-requirements">1.6 Non-Functional Requirements</h3>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Requirement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Security</td>
+<td>TLS 1.2+ everywhere, encryption at rest (MinIO SSE), password hashing (bcrypt/argon2), JWT-based auth, RBAC</td>
+</tr>
+<tr>
+<td>Privacy</td>
+<td>Data isolated per patient; no cross-tenant access; audit trail; ability to export/delete own data (GDPR "right to be forgotten")</td>
+</tr>
+<tr>
+<td>Availability</td>
+<td>99.5%+ target; horizontally scalable stateless backend</td>
+</tr>
+<tr>
+<td>Performance</td>
+<td>File upload ≤ 25MB completes &lt; 10s on broadband; list APIs &lt; 300ms p95</td>
+</tr>
+<tr>
+<td>Scalability</td>
+<td>Support growth from 1K → 1M users without architecture rewrite (stateless services + object storage + DB read replicas)</td>
+</tr>
+<tr>
+<td>Usability</td>
+<td>Mobile-responsive; accessible (WCAG 2.1 AA where practical)</td>
+</tr>
+<tr>
+<td>Compliance-readiness</td>
+<td>Architecture should not block future HIPAA/GDPR/ISO 27001 certification</td>
+</tr>
+<tr>
+<td>Observability</td>
+<td>Centralized logs, metrics, tracing, alerting</td>
+</tr>
+</tbody>
+</table>
+<h3 id="17-assumptions-constraints">1.7 Assumptions &amp; Constraints</h3>
+<ul>
+<li>Initial deployment is self-hosted or on a single cloud provider (AWS/GCP/Azure/on-prem K8s).</li>
+<li>MinIO is used instead of a managed cloud object store for portability and cost control, but the abstraction should allow swapping to AWS S3 later (S3-compatible API).</li>
+<li>Regulatory certification (HIPAA/GDPR formal compliance) is a business/legal process on top of this technical foundation — this plan makes the architecture <em>capable</em> of compliance, not a legal guarantee.</li>
+</ul>
+<h3 id="18-success-metrics">1.8 Success Metrics</h3>
+<ul>
+<li>% of users who upload ≥ 1 document within first session</li>
+<li>Average time-to-find-a-record (search latency + UX)</li>
+<li>Monthly active users, retention at 30/90 days</li>
+<li>Zero critical security incidents; audit-log coverage of 100% of record access events</li>
+</ul>
+<hr />
+<h2 id="2-high-level-system-architecture">2. High-Level System Architecture</h2>
+<div class="mermaid">
+flowchart TB
+    subgraph Client
+        WEB[React.js SPA<br/>Web Browser]
+        MOB[React Native App<br/>Phase 2]
+    end
+
+    subgraph Edge
+        CDN[CDN / Static Hosting<br/>for React build]
+        LB[Load Balancer / API Gateway<br/>Nginx / Traefik]
+    end
+
+    subgraph AppLayer["Spring Boot Backend (Stateless, Horizontally Scaled)"]
+        AUTH[Auth Service<br/>JWT, OAuth2]
+        API[Core API<br/>Records, Users, Sharing]
+        FILEAPI[File Service<br/>Upload/Download proxy]
+        NOTIF[Notification Service<br/>Email/SMS]
+        AUDIT[Audit Service]
+    end
+
+    subgraph DataLayer
+        PG[(PostgreSQL<br/>Primary + Read Replica)]
+        REDIS[(Redis<br/>Cache / Session / Rate limit)]
+        MINIO[(MinIO Cluster<br/>Object Storage - S3 API)]
+        ES[(Elasticsearch<br/>Optional: full-text search)]
+    end
+
+    subgraph Support
+        MAIL[SMTP/Email Provider]
+        MONITOR[Prometheus + Grafana]
+        LOGS[ELK / Loki]
+        VAULT[Secrets Manager<br/>Vault / KMS]
+    end
+
+    WEB --> CDN
+    WEB --> LB
+    MOB --> LB
+    LB --> AUTH
+    LB --> API
+    LB --> FILEAPI
+    API --> PG
+    API --> REDIS
+    API --> ES
+    AUTH --> PG
+    AUTH --> REDIS
+    FILEAPI --> MINIO
+    FILEAPI --> PG
+    NOTIF --> MAIL
+    API --> NOTIF
+    API --> AUDIT
+    AUDIT --> PG
+    AppLayer --> VAULT
+    AppLayer --> MONITOR
+    AppLayer --> LOGS
+
+</div>
+<h3 id="key-architectural-decisions">Key architectural decisions</h3>
+<ol>
+<li><strong>Stateless Spring Boot services</strong> behind a load balancer → horizontal scaling, easy container orchestration (Docker/K8s).</li>
+<li><strong>PostgreSQL</strong> for all relational/metadata data (users, records metadata, permissions, audit logs) — strong ACID guarantees needed for medical data.</li>
+<li><strong>MinIO</strong> for actual file bytes (S3-compatible API) — decouples large binary storage from the DB, supports presigned URLs, versioning, and server-side encryption. Swappable for AWS S3/GCS later with near-zero code change (same S3 SDK).</li>
+<li><strong>Redis</strong> for session/token caching, rate limiting, and short-lived share-link caching.</li>
+<li><strong>JWT (access + refresh token)</strong> based stateless auth, with optional OAuth2 login (Google) later.</li>
+<li><strong>Audit service</strong> writes an immutable log (append-only table, optionally also mirrored to a separate log store) for every read/write/share/download — required for medical-data trust and future compliance.</li>
+<li><strong>API Gateway/Nginx</strong> in front of services handles TLS termination, routing, and basic rate limiting.</li>
+<li><strong>Presigned URLs</strong>: for large-file upload/download the backend should generate MinIO presigned URLs, so files can go client ⇄ MinIO directly without proxying every byte through Spring Boot (better performance, less backend load), while Spring Boot still validates, records metadata, and controls access before generating the URL.</li>
+</ol>
+<hr />
+<h2 id="3-complete-application-flow">3. Complete Application Flow</h2>
+<h3 id="31-user-registration-login">3.1 User Registration &amp; Login</h3>
+<div class="mermaid">
+sequenceDiagram
+    actor U as Patient
+    participant FE as React App
+    participant API as Spring Boot API
+    participant DB as PostgreSQL
+    participant MAIL as Email Service
+
+    U->>FE: Fill signup form (name, email, password)
+    FE->>API: POST /api/v1/auth/register
+    API->>DB: Create user (status=UNVERIFIED)
+    API->>MAIL: Send verification OTP/link
+    MAIL-->>U: Email with OTP
+    U->>FE: Enter OTP
+    FE->>API: POST /api/v1/auth/verify-email
+    API->>DB: Update status=ACTIVE
+    API-->>FE: Success
+    U->>FE: Login (email/password)
+    FE->>API: POST /api/v1/auth/login
+    API->>DB: Validate credentials
+    API-->>FE: access_token (JWT, 15 min) + refresh_token (7-30 days, httpOnly cookie)
+    FE->>FE: Store access token in memory, refresh via cookie
+
+</div>
+<h3 id="32-upload-a-medical-record">3.2 Upload a Medical Record</h3>
+<div class="mermaid">
+sequenceDiagram
+    actor U as Patient
+    participant FE as React App
+    participant API as Spring Boot API
+    participant DB as PostgreSQL
+    participant S3 as MinIO
+
+    U->>FE: Select file(s) + fill metadata (type, date, doctor, tags)
+    FE->>API: POST /api/v1/records/initiate-upload (filename, size, mimeType)
+    API->>API: Validate file type/size, virus-scan hook, quota check
+    API->>DB: Create record row (status=PENDING), generate storage key
+    API->>S3: Request presigned PUT URL
+    API-->>FE: presignedUrl + recordId
+    FE->>S3: PUT file directly to MinIO (presigned URL)
+    S3-->>FE: 200 OK
+    FE->>API: POST /api/v1/records/{id}/complete-upload
+    API->>S3: HEAD object (verify size/checksum)
+    API->>DB: Update record status=ACTIVE, save checksum, size
+    API->>DB: Insert audit_log (UPLOAD)
+    API-->>FE: Record details (ready to view)
+
+</div>
+<h3 id="33-view-download-a-record">3.3 View / Download a Record</h3>
+<div class="mermaid">
+sequenceDiagram
+    actor U as Patient
+    participant FE as React App
+    participant API as Spring Boot API
+    participant S3 as MinIO
+
+    U->>FE: Click "View/Download" on a record
+    FE->>API: GET /api/v1/records/{id}/download-url
+    API->>API: Check ownership/permission
+    API->>S3: Generate presigned GET URL (short-lived, e.g. 5 min)
+    API->>API: Write audit_log (VIEW/DOWNLOAD)
+    API-->>FE: presignedUrl
+    FE->>S3: GET file (direct download/preview)
+
+</div>
+<h3 id="34-share-a-record">3.4 Share a Record</h3>
+<div class="mermaid">
+sequenceDiagram
+    actor U as Patient
+    participant FE as React App
+    participant API as Spring Boot API
+    participant DB as PostgreSQL
+    actor R as Recipient (doctor/family)
+
+    U->>FE: Select record(s) → "Share"
+    FE->>API: POST /api/v1/shares (recordIds, expiresAt, recipientEmail?, permission=VIEW)
+    API->>DB: Create share row + unique token
+    API-->>FE: Shareable link (https://app/share/{token})
+    U->>R: Sends link (out of band)
+    R->>FE: Opens link
+    FE->>API: GET /api/v1/shares/{token}
+    API->>DB: Validate token not expired/revoked
+    API-->>FE: Read-only record view (no account needed, or login if recipient account required)
+
+</div>
+<h3 id="35-multi-profile-dependents-flow-phase-2">3.5 Multi-Profile (Dependents) Flow — Phase 2</h3>
+<ul>
+<li>Primary account can create "linked profiles" (e.g., child, parent).</li>
+<li>Each linked profile has its own set of records but shares the parent account's login.</li>
+<li>Access is modeled via <code>family_members</code> + <code>profile_id</code> on records, with the owning <code>user_id</code> unchanged — see schema below.</li>
+</ul>
+<hr />
+<h2 id="4-database-design-postgresql">4. Database Design (PostgreSQL)</h2>
+<h3 id="41-entity-relationship-diagram">4.1 Entity Relationship Diagram</h3>
+<div class="mermaid">
+erDiagram
+    USERS ||--o{ PROFILES : owns
+    USERS ||--o{ REFRESH_TOKENS : has
+    USERS ||--o{ AUDIT_LOGS : generates
+    PROFILES ||--o{ MEDICAL_RECORDS : contains
+    MEDICAL_RECORDS ||--o{ RECORD_FILES : has
+    MEDICAL_RECORDS ||--o{ RECORD_TAGS : tagged_with
+    TAGS ||--o{ RECORD_TAGS : used_in
+    MEDICAL_RECORDS ||--o{ SHARES : shared_via
+    SHARES ||--o{ SHARE_ACCESS_LOGS : accessed_via
+    MEDICAL_RECORDS }o--|| CATEGORIES : belongs_to
+    MEDICAL_RECORDS ||--o{ AUDIT_LOGS : referenced_in
+    USERS ||--o{ NOTIFICATIONS : receives
+
+    USERS {
+        uuid id PK
+        varchar email
+        varchar password_hash
+        varchar full_name
+        varchar phone
+        varchar role
+        varchar status
+        boolean email_verified
+        boolean mfa_enabled
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
+    PROFILES {
+        uuid id PK
+        uuid user_id FK
+        varchar display_name
+        varchar relation
+        date date_of_birth
+        varchar gender
+        boolean is_primary
+        timestamptz created_at
+    }
+
+    CATEGORIES {
+        uuid id PK
+        varchar name
+        varchar code
+        varchar icon
+        boolean is_system_default
+    }
+
+    MEDICAL_RECORDS {
+        uuid id PK
+        uuid profile_id FK
+        uuid category_id FK
+        varchar title
+        text description
+        varchar doctor_name
+        varchar hospital_name
+        date record_date
+        varchar status
+        varchar visibility
+        timestamptz created_at
+        timestamptz updated_at
+        timestamptz deleted_at
+    }
+
+    RECORD_FILES {
+        uuid id PK
+        uuid record_id FK
+        varchar storage_bucket
+        varchar storage_key
+        varchar original_filename
+        varchar mime_type
+        bigint size_bytes
+        varchar checksum_sha256
+        varchar upload_status
+        timestamptz created_at
+    }
+
+    TAGS {
+        uuid id PK
+        uuid user_id FK
+        varchar name
+    }
+
+    RECORD_TAGS {
+        uuid record_id FK
+        uuid tag_id FK
+    }
+
+    SHARES {
+        uuid id PK
+        uuid record_id FK
+        uuid created_by FK
+        varchar token
+        varchar recipient_email
+        varchar permission
+        timestamptz expires_at
+        boolean revoked
+        timestamptz created_at
+    }
+
+    SHARE_ACCESS_LOGS {
+        uuid id PK
+        uuid share_id FK
+        varchar accessed_by_ip
+        varchar user_agent
+        timestamptz accessed_at
+    }
+
+    AUDIT_LOGS {
+        uuid id PK
+        uuid user_id FK
+        uuid record_id FK
+        varchar action
+        varchar ip_address
+        varchar user_agent
+        jsonb metadata
+        timestamptz created_at
+    }
+
+    REFRESH_TOKENS {
+        uuid id PK
+        uuid user_id FK
+        varchar token_hash
+        timestamptz expires_at
+        boolean revoked
+        timestamptz created_at
+    }
+
+    NOTIFICATIONS {
+        uuid id PK
+        uuid user_id FK
+        varchar type
+        varchar title
+        text body
+        boolean is_read
+        timestamptz created_at
+    }
+
+</div>
+<h3 id="42-ddl-core-tables">4.2 DDL (core tables)</h3>
+<div class="codehilite"><pre><span></span><code><span class="k">CREATE</span><span class="w"> </span><span class="n">EXTENSION</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="ss">&quot;pgcrypto&quot;</span><span class="p">;</span>
+
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w">                </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">gen_random_uuid</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">email</span><span class="w">             </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span><span class="w"> </span><span class="k">UNIQUE</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">password_hash</span><span class="w">     </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">full_name</span><span class="w">         </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">150</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">phone</span><span class="w">             </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span>
+<span class="w">    </span><span class="k">role</span><span class="w">              </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">&#39;PATIENT&#39;</span><span class="p">,</span><span class="w"> </span><span class="c1">-- PATIENT, DOCTOR, ADMIN</span>
+<span class="w">    </span><span class="n">status</span><span class="w">            </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">&#39;UNVERIFIED&#39;</span><span class="p">,</span><span class="w"> </span><span class="c1">-- UNVERIFIED, ACTIVE, SUSPENDED, DELETED</span>
+<span class="w">    </span><span class="n">email_verified</span><span class="w">    </span><span class="nb">BOOLEAN</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">FALSE</span><span class="p">,</span>
+<span class="w">    </span><span class="n">mfa_enabled</span><span class="w">       </span><span class="nb">BOOLEAN</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">FALSE</span><span class="p">,</span>
+<span class="w">    </span><span class="n">mfa_secret</span><span class="w">        </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">255</span><span class="p">),</span>
+<span class="w">    </span><span class="n">storage_quota_mb</span><span class="w">  </span><span class="nb">BIGINT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">2048</span><span class="p">,</span>
+<span class="w">    </span><span class="n">storage_used_mb</span><span class="w">   </span><span class="nb">BIGINT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">    </span><span class="n">created_at</span><span class="w">        </span><span class="n">TIMESTAMPTZ</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">now</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">updated_at</span><span class="w">        </span><span class="n">TIMESTAMPTZ</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">now</span><span class="p">()</span>
+<span class="p">);</span>
+
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">profiles</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w">            </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">gen_random_uuid</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">user_id</span><span class="w">       </span><span class="n">UUID</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">users</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">DELETE</span><span class="w"> </span><span class="k">CASCADE</span><span class="p">,</span>
+<span class="w">    </span><span class="n">display_name</span><span class="w">  </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">150</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">relation</span><span class="w">      </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">&#39;SELF&#39;</span><span class="p">,</span><span class="w"> </span><span class="c1">-- SELF, CHILD, PARENT, SPOUSE, OTHER</span>
+<span class="w">    </span><span class="n">date_of_birth</span><span class="w"> </span><span class="nb">DATE</span><span class="p">,</span>
+<span class="w">    </span><span class="n">gender</span><span class="w">        </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">15</span><span class="p">),</span>
+<span class="w">    </span><span class="n">is_primary</span><span class="w">    </span><span class="nb">BOOLEAN</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">TRUE</span><span class="p">,</span>
+<span class="w">    </span><span class="n">created_at</span><span class="w">    </span><span class="n">TIMESTAMPTZ</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">now</span><span class="p">()</span>
+<span class="p">);</span>
+
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">categories</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w">                </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">gen_random_uuid</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">name</span><span class="w">              </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">80</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">code</span><span class="w">              </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">40</span><span class="p">)</span><span class="w"> </span><span class="k">UNIQUE</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="c1">-- PRESCRIPTION, LAB_REPORT, XRAY, DISCHARGE_SUMMARY, VACCINATION, INSURANCE, OTHER</span>
+<span class="w">    </span><span class="n">icon</span><span class="w">              </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span>
+<span class="w">    </span><span class="n">is_system_default</span><span class="w"> </span><span class="nb">BOOLEAN</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">TRUE</span>
+<span class="p">);</span>
+
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">medical_records</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w">            </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">gen_random_uuid</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">profile_id</span><span class="w">    </span><span class="n">UUID</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">profiles</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">DELETE</span><span class="w"> </span><span class="k">CASCADE</span><span class="p">,</span>
+<span class="w">    </span><span class="n">category_id</span><span class="w">   </span><span class="n">UUID</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">categories</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">title</span><span class="w">         </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">description</span><span class="w">   </span><span class="nb">TEXT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">doctor_name</span><span class="w">   </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">150</span><span class="p">),</span>
+<span class="w">    </span><span class="n">hospital_name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">150</span><span class="p">),</span>
+<span class="w">    </span><span class="n">record_date</span><span class="w">   </span><span class="nb">DATE</span><span class="p">,</span>
+<span class="w">    </span><span class="n">status</span><span class="w">        </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">&#39;ACTIVE&#39;</span><span class="p">,</span><span class="w"> </span><span class="c1">-- PENDING, ACTIVE, ARCHIVED, DELETED</span>
+<span class="w">    </span><span class="n">visibility</span><span class="w">    </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">&#39;PRIVATE&#39;</span><span class="p">,</span><span class="w"> </span><span class="c1">-- PRIVATE, SHARED</span>
+<span class="w">    </span><span class="n">created_at</span><span class="w">    </span><span class="n">TIMESTAMPTZ</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">now</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">updated_at</span><span class="w">    </span><span class="n">TIMESTAMPTZ</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">now</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">deleted_at</span><span class="w">    </span><span class="n">TIMESTAMPTZ</span>
+<span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_records_profile</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">medical_records</span><span class="p">(</span><span class="n">profile_id</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_records_category</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">medical_records</span><span class="p">(</span><span class="n">category_id</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_records_date</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">medical_records</span><span class="p">(</span><span class="n">record_date</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_records_title_trgm</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">medical_records</span><span class="w"> </span><span class="k">USING</span><span class="w"> </span><span class="n">gin</span><span class="w"> </span><span class="p">(</span><span class="n">title</span><span class="w"> </span><span class="n">gin_trgm_ops</span><span class="p">);</span>
+
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">record_files</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w">                </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">gen_random_uuid</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">record_id</span><span class="w">         </span><span class="n">UUID</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">medical_records</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">DELETE</span><span class="w"> </span><span class="k">CASCADE</span><span class="p">,</span>
+<span class="w">    </span><span class="n">storage_bucket</span><span class="w">    </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">storage_key</span><span class="w">       </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">500</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">original_filename</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">mime_type</span><span class="w">         </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">size_bytes</span><span class="w">        </span><span class="nb">BIGINT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">checksum_sha256</span><span class="w">   </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">64</span><span class="p">),</span>
+<span class="w">    </span><span class="n">upload_status</span><span class="w">     </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">&#39;PENDING&#39;</span><span class="p">,</span><span class="w"> </span><span class="c1">-- PENDING, UPLOADED, FAILED</span>
+<span class="w">    </span><span class="n">created_at</span><span class="w">        </span><span class="n">TIMESTAMPTZ</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">now</span><span class="p">()</span>
+<span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_files_record</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">record_files</span><span class="p">(</span><span class="n">record_id</span><span class="p">);</span>
+
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">tags</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w">      </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">gen_random_uuid</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">user_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">users</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">DELETE</span><span class="w"> </span><span class="k">CASCADE</span><span class="p">,</span>
+<span class="w">    </span><span class="n">name</span><span class="w">    </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">60</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="k">UNIQUE</span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">)</span>
+<span class="p">);</span>
+
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">record_tags</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">record_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">medical_records</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">DELETE</span><span class="w"> </span><span class="k">CASCADE</span><span class="p">,</span>
+<span class="w">    </span><span class="n">tag_id</span><span class="w">    </span><span class="n">UUID</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">tags</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">DELETE</span><span class="w"> </span><span class="k">CASCADE</span><span class="p">,</span>
+<span class="w">    </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="p">(</span><span class="n">record_id</span><span class="p">,</span><span class="w"> </span><span class="n">tag_id</span><span class="p">)</span>
+<span class="p">);</span>
+
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">shares</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w">              </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">gen_random_uuid</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">record_id</span><span class="w">       </span><span class="n">UUID</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">medical_records</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">DELETE</span><span class="w"> </span><span class="k">CASCADE</span><span class="p">,</span>
+<span class="w">    </span><span class="n">created_by</span><span class="w">      </span><span class="n">UUID</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">users</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">token</span><span class="w">           </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">128</span><span class="p">)</span><span class="w"> </span><span class="k">UNIQUE</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">recipient_email</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">255</span><span class="p">),</span>
+<span class="w">    </span><span class="n">permission</span><span class="w">      </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">&#39;VIEW&#39;</span><span class="p">,</span><span class="w"> </span><span class="c1">-- VIEW, DOWNLOAD</span>
+<span class="w">    </span><span class="n">expires_at</span><span class="w">      </span><span class="n">TIMESTAMPTZ</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">revoked</span><span class="w">         </span><span class="nb">BOOLEAN</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">FALSE</span><span class="p">,</span>
+<span class="w">    </span><span class="n">created_at</span><span class="w">      </span><span class="n">TIMESTAMPTZ</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">now</span><span class="p">()</span>
+<span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_shares_token</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">shares</span><span class="p">(</span><span class="n">token</span><span class="p">);</span>
+
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">share_access_logs</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w">              </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">gen_random_uuid</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">share_id</span><span class="w">        </span><span class="n">UUID</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">shares</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">DELETE</span><span class="w"> </span><span class="k">CASCADE</span><span class="p">,</span>
+<span class="w">    </span><span class="n">accessed_by_ip</span><span class="w">  </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">64</span><span class="p">),</span>
+<span class="w">    </span><span class="n">user_agent</span><span class="w">      </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">255</span><span class="p">),</span>
+<span class="w">    </span><span class="n">accessed_at</span><span class="w">     </span><span class="n">TIMESTAMPTZ</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">now</span><span class="p">()</span>
+<span class="p">);</span>
+
+<span class="c1">-- Append-only audit table; never UPDATE, only INSERT</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">audit_logs</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w">          </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">gen_random_uuid</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">user_id</span><span class="w">     </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">users</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">record_id</span><span class="w">   </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">medical_records</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">action</span><span class="w">      </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">40</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="c1">-- LOGIN, LOGOUT, UPLOAD, VIEW, DOWNLOAD, SHARE, DELETE, UPDATE_METADATA</span>
+<span class="w">    </span><span class="n">ip_address</span><span class="w">  </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">64</span><span class="p">),</span>
+<span class="w">    </span><span class="n">user_agent</span><span class="w">  </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">255</span><span class="p">),</span>
+<span class="w">    </span><span class="n">metadata</span><span class="w">    </span><span class="n">JSONB</span><span class="p">,</span>
+<span class="w">    </span><span class="n">created_at</span><span class="w">  </span><span class="n">TIMESTAMPTZ</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">now</span><span class="p">()</span>
+<span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_audit_user</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">audit_logs</span><span class="p">(</span><span class="n">user_id</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_audit_record</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">audit_logs</span><span class="p">(</span><span class="n">record_id</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_audit_created</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">audit_logs</span><span class="p">(</span><span class="n">created_at</span><span class="p">);</span>
+
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">refresh_tokens</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w">          </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">gen_random_uuid</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">user_id</span><span class="w">     </span><span class="n">UUID</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">users</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">DELETE</span><span class="w"> </span><span class="k">CASCADE</span><span class="p">,</span>
+<span class="w">    </span><span class="n">token_hash</span><span class="w">  </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">expires_at</span><span class="w">  </span><span class="n">TIMESTAMPTZ</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">revoked</span><span class="w">     </span><span class="nb">BOOLEAN</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">FALSE</span><span class="p">,</span>
+<span class="w">    </span><span class="n">created_at</span><span class="w">  </span><span class="n">TIMESTAMPTZ</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">now</span><span class="p">()</span>
+<span class="p">);</span>
+
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">notifications</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w">         </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">gen_random_uuid</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">user_id</span><span class="w">    </span><span class="n">UUID</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">users</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">DELETE</span><span class="w"> </span><span class="k">CASCADE</span><span class="p">,</span>
+<span class="w">    </span><span class="k">type</span><span class="w">       </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">40</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">title</span><span class="w">      </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">150</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">body</span><span class="w">       </span><span class="nb">TEXT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">is_read</span><span class="w">    </span><span class="nb">BOOLEAN</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">FALSE</span><span class="p">,</span>
+<span class="w">    </span><span class="n">created_at</span><span class="w"> </span><span class="n">TIMESTAMPTZ</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">now</span><span class="p">()</span>
+<span class="p">);</span>
+</code></pre></div>
+
+<p><strong>Design notes</strong>
+- <code>medical_records</code> never stores the file itself — only metadata; actual bytes live in MinIO, referenced by <code>record_files.storage_key</code>.
+- Soft delete via <code>deleted_at</code>/<code>status</code> so patients can "recover" accidentally deleted records within a grace window (e.g., 30 days) before a background job purges them from MinIO too.
+- <code>audit_logs</code> is append-only and should ideally also be shipped to a separate immutable store (e.g., write-once S3/MinIO bucket or a log pipeline) for tamper resistance.
+- Full-text search: start with Postgres <code>pg_trgm</code>/<code>tsvector</code> on <code>title</code>/<code>description</code>; move to Elasticsearch in Phase 2 once OCR text needs indexing.
+- Partition <code>audit_logs</code> and <code>share_access_logs</code> by month once volume grows (Postgres native partitioning).</p>
+<hr />
+<h2 id="5-api-structure-endpoints">5. API Structure &amp; Endpoints</h2>
+<p>Base path: <code>/api/v1</code>. All endpoints (except auth/share-view) require <code>Authorization: Bearer &lt;JWT&gt;</code>.</p>
+<h3 id="51-auth">5.1 Auth</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST</td>
+<td><code>/auth/register</code></td>
+<td>Create account (email, password, full name)</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/auth/verify-email</code></td>
+<td>Verify OTP/token sent to email</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/auth/login</code></td>
+<td>Login → returns access token + sets refresh cookie</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/auth/refresh</code></td>
+<td>Exchange refresh token for new access token</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/auth/logout</code></td>
+<td>Revoke refresh token</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/auth/forgot-password</code></td>
+<td>Send password reset link</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/auth/reset-password</code></td>
+<td>Reset password using token</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/auth/mfa/enable</code></td>
+<td>Enable TOTP MFA (Phase 3)</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/auth/mfa/verify</code></td>
+<td>Verify TOTP code at login</td>
+</tr>
+</tbody>
+</table>
+<h3 id="52-users-profiles">5.2 Users &amp; Profiles</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/users/me</code></td>
+<td>Get current user profile + storage usage</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td><code>/users/me</code></td>
+<td>Update name/phone</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/users/me/change-password</code></td>
+<td>Change password</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/profiles</code></td>
+<td>List family/linked profiles</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/profiles</code></td>
+<td>Create a new profile (dependent)</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td><code>/profiles/{id}</code></td>
+<td>Update profile</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/profiles/{id}</code></td>
+<td>Delete profile (cascades records — with confirmation)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="53-categories-tags">5.3 Categories &amp; Tags</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/categories</code></td>
+<td>List system categories</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/tags</code></td>
+<td>List user's tags</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/tags</code></td>
+<td>Create tag</td>
+</tr>
+</tbody>
+</table>
+<h3 id="54-medical-records">5.4 Medical Records</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/records</code></td>
+<td>List records (filters: profileId, categoryId, tag, doctor, dateFrom, dateTo, q; paginated)</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/records/{id}</code></td>
+<td>Get record detail + file metadata</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/records</code></td>
+<td>Create record metadata (before file upload)</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td><code>/records/{id}</code></td>
+<td>Update metadata (title, tags, doctor, etc.)</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/records/{id}</code></td>
+<td>Soft-delete record</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/records/{id}/restore</code></td>
+<td>Restore soft-deleted record</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/records/{id}/files/{fileId}/upload-url</code></td>
+<td>Get presigned PUT URL</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/records/{id}/files/{fileId}/complete</code></td>
+<td>Confirm upload completed</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/records/{id}/files/{fileId}/download-url</code></td>
+<td>Get presigned GET URL</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/records/search</code></td>
+<td>Full-text search across title/description/OCR text</td>
+</tr>
+</tbody>
+</table>
+<h3 id="55-sharing">5.5 Sharing</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST</td>
+<td><code>/shares</code></td>
+<td>Create share link for one or more records</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/shares</code></td>
+<td>List active shares created by user</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/shares/{id}</code></td>
+<td>Revoke a share</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/shares/public/{token}</code></td>
+<td>(No auth) Resolve a share token → record metadata + view/download URL</td>
+</tr>
+</tbody>
+</table>
+<h3 id="56-notifications">5.6 Notifications</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/notifications</code></td>
+<td>List notifications</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td><code>/notifications/{id}/read</code></td>
+<td>Mark as read</td>
+</tr>
+</tbody>
+</table>
+<h3 id="57-admin-roleadmin">5.7 Admin (role=ADMIN)</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/admin/users</code></td>
+<td>List/search users</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td><code>/admin/users/{id}/status</code></td>
+<td>Suspend/reactivate user</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/admin/audit-logs</code></td>
+<td>Query audit logs</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/admin/system/health</code></td>
+<td>System health/metrics summary</td>
+</tr>
+</tbody>
+</table>
+<h3 id="58-sample-requestresponse">5.8 Sample request/response</h3>
+<div class="codehilite"><pre><span></span><code>POST /api/v1/records
+Authorization: Bearer &lt;token&gt;
+Content-Type: application/json
+
+{
+  &quot;profileId&quot;: &quot;5f2c...&quot;,
+  &quot;categoryId&quot;: &quot;b1a9...&quot;,
+  &quot;title&quot;: &quot;Blood Test - Annual Checkup&quot;,
+  &quot;doctorName&quot;: &quot;Dr. A. Sharma&quot;,
+  &quot;hospitalName&quot;: &quot;City Hospital&quot;,
+  &quot;recordDate&quot;: &quot;2026-08-12&quot;,
+  &quot;tags&quot;: [&quot;annual-checkup&quot;, &quot;blood-test&quot;],
+  &quot;files&quot;: [
+    { &quot;originalFilename&quot;: &quot;lab_report.pdf&quot;, &quot;mimeType&quot;: &quot;application/pdf&quot;, &quot;sizeBytes&quot;: 245000 }
+  ]
+}
+
+--&gt; 201 Created
+{
+  &quot;id&quot;: &quot;9c31...&quot;,
+  &quot;status&quot;: &quot;PENDING&quot;,
+  &quot;files&quot;: [
+    { &quot;id&quot;: &quot;e77a...&quot;, &quot;uploadUrl&quot;: &quot;https://minio.internal/medvault/9c31/e77a?X-Amz-...&quot;, &quot;expiresIn&quot;: 300 }
+  ]
+}
+</code></pre></div>
+
+<hr />
+<h2 id="6-spring-boot-backend-architecture">6. Spring Boot Backend Architecture</h2>
+<h3 id="61-modulepackage-structure-single-deployable-modular-monolith-recommended-for-mvp">6.1 Module/package structure (single deployable, modular monolith — recommended for MVP)</h3>
+<div class="codehilite"><pre><span></span><code>medvault-backend/
+├── pom.xml (or build.gradle)
+├── src/main/java/com/medvault/
+│   ├── MedVaultApplication.java
+│   │
+│   ├── config/
+│   │   ├── SecurityConfig.java          # Spring Security filter chain, CORS
+│   │   ├── JwtConfig.java
+│   │   ├── MinioConfig.java             # MinIO client bean
+│   │   ├── OpenApiConfig.java           # Swagger/OpenAPI
+│   │   ├── RedisConfig.java
+│   │   └── WebConfig.java
+│   │
+│   ├── common/
+│   │   ├── exception/                   # GlobalExceptionHandler, custom exceptions
+│   │   ├── response/                    # ApiResponse&lt;T&gt;, PageResponse&lt;T&gt;
+│   │   ├── util/                        # FileUtils, DateUtils, ChecksumUtils
+│   │   └── constants/
+│   │
+│   ├── security/
+│   │   ├── JwtTokenProvider.java
+│   │   ├── JwtAuthenticationFilter.java
+│   │   ├── CustomUserDetailsService.java
+│   │   ├── RateLimitFilter.java
+│   │   └── PermissionEvaluator.java     # record-level ownership checks
+│   │
+│   ├── auth/
+│   │   ├── controller/AuthController.java
+│   │   ├── service/AuthService.java
+│   │   ├── dto/ (RegisterRequest, LoginRequest, TokenResponse, ...)
+│   │   └── entity/RefreshToken.java
+│   │
+│   ├── user/
+│   │   ├── controller/UserController.java
+│   │   ├── service/UserService.java
+│   │   ├── repository/UserRepository.java
+│   │   ├── entity/User.java
+│   │   └── dto/
+│   │
+│   ├── profile/
+│   │   ├── controller/ProfileController.java
+│   │   ├── service/ProfileService.java
+│   │   ├── repository/ProfileRepository.java
+│   │   └── entity/Profile.java
+│   │
+│   ├── record/
+│   │   ├── controller/MedicalRecordController.java
+│   │   ├── service/MedicalRecordService.java
+│   │   ├── repository/MedicalRecordRepository.java
+│   │   ├── repository/MedicalRecordSpecification.java  # dynamic filters
+│   │   ├── entity/MedicalRecord.java
+│   │   ├── entity/RecordFile.java
+│   │   ├── entity/Category.java
+│   │   ├── entity/Tag.java
+│   │   └── dto/
+│   │
+│   ├── file/
+│   │   ├── controller/FileController.java
+│   │   ├── service/FileStorageService.java     # wraps MinioClient: presign, checksum, delete
+│   │   └── service/VirusScanService.java        # optional ClamAV integration hook
+│   │
+│   ├── share/
+│   │   ├── controller/ShareController.java
+│   │   ├── service/ShareService.java
+│   │   ├── repository/ShareRepository.java
+│   │   └── entity/Share.java
+│   │
+│   ├── audit/
+│   │   ├── aspect/AuditAspect.java       # AOP: auto-log annotated methods
+│   │   ├── service/AuditService.java
+│   │   ├── repository/AuditLogRepository.java
+│   │   └── entity/AuditLog.java
+│   │
+│   ├── notification/
+│   │   ├── service/NotificationService.java
+│   │   ├── service/EmailService.java
+│   │   └── entity/Notification.java
+│   │
+│   └── admin/
+│       ├── controller/AdminController.java
+│       └── service/AdminService.java
+│
+├── src/main/resources/
+│   ├── application.yml
+│   ├── application-dev.yml
+│   ├── application-prod.yml
+│   └── db/migration/                    # Flyway SQL migration scripts V1__init.sql ...
+│
+└── src/test/java/com/medvault/...        # unit + integration tests (Testcontainers for PG/MinIO)
+</code></pre></div>
+
+<h3 id="62-key-technology-choices">6.2 Key technology choices</h3>
+<table>
+<thead>
+<tr>
+<th>Concern</th>
+<th>Technology</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Language/Framework</td>
+<td>Java 17/21 + Spring Boot 3.x</td>
+</tr>
+<tr>
+<td>Web</td>
+<td>Spring Web (REST), Spring Validation</td>
+</tr>
+<tr>
+<td>Security</td>
+<td>Spring Security 6 + JJWT (or Nimbus JOSE) for JWT</td>
+</tr>
+<tr>
+<td>Persistence</td>
+<td>Spring Data JPA + Hibernate, PostgreSQL driver</td>
+</tr>
+<tr>
+<td>Migrations</td>
+<td>Flyway (never rely on Hibernate auto-ddl in prod)</td>
+</tr>
+<tr>
+<td>Object storage client</td>
+<td>MinIO Java SDK (<code>io.minio:minio</code>) — S3-compatible</td>
+</tr>
+<tr>
+<td>Caching/session</td>
+<td>Spring Data Redis</td>
+</tr>
+<tr>
+<td>Async/events</td>
+<td>Spring Events or lightweight Kafka/RabbitMQ (Phase 2, e.g. for OCR job queue, email queue)</td>
+</tr>
+<tr>
+<td>API docs</td>
+<td>springdoc-openapi (Swagger UI)</td>
+</tr>
+<tr>
+<td>Mapping</td>
+<td>MapStruct (entity ↔ DTO)</td>
+</tr>
+<tr>
+<td>Testing</td>
+<td>JUnit 5, Mockito, Testcontainers (Postgres + MinIO), REST Assured</td>
+</tr>
+<tr>
+<td>Build</td>
+<td>Maven or Gradle</td>
+</tr>
+<tr>
+<td>Containerization</td>
+<td>Docker multi-stage build</td>
+</tr>
+</tbody>
+</table>
+<h3 id="63-security-filter-chain-conceptual">6.3 Security filter chain (conceptual)</h3>
+<div class="codehilite"><pre><span></span><code>Request
+  → CORS filter
+  → JwtAuthenticationFilter (parses Bearer token, sets SecurityContext)
+  → RateLimitFilter (Redis token bucket per user/IP)
+  → Method-level @PreAuthorize checks (role + ownership via PermissionEvaluator)
+  → Controller → Service → Repository
+</code></pre></div>
+
+<h3 id="64-ownershipauthorization-pattern">6.4 Ownership/authorization pattern</h3>
+<p>Every record-level endpoint checks that the authenticated user owns the <code>profile_id</code> tied to the record (or has an active, unexpired <code>share</code>), enforced centrally, e.g.:</p>
+<div class="codehilite"><pre><span></span><code><span class="nd">@PreAuthorize</span><span class="p">(</span><span class="s">&quot;@recordPermissionEvaluator.canAccess(#recordId, principal)&quot;</span><span class="p">)</span>
+<span class="nd">@GetMapping</span><span class="p">(</span><span class="s">&quot;/{recordId}&quot;</span><span class="p">)</span>
+<span class="kd">public</span><span class="w"> </span><span class="n">ApiResponse</span><span class="o">&lt;</span><span class="n">RecordDto</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">getRecord</span><span class="p">(</span><span class="nd">@PathVariable</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="n">recordId</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+
+<p>This avoids relying on ad-hoc <code>if</code> checks scattered in services and centralizes the security-critical logic.</p>
+<h3 id="65-growth-path-modular-monolith-microservices">6.5 Growth path: modular monolith → microservices</h3>
+<p>Start as a single Spring Boot deployable with clear package boundaries (as above). If/when scale demands it, <code>auth</code>, <code>file</code>, and <code>notification</code> packages are the natural first extraction candidates into separate services, since they have the fewest cross-cutting transactional dependencies on <code>record</code>/<code>profile</code>.</p>
+<hr />
+<h2 id="7-reactjs-frontend-architecture">7. React.js Frontend Architecture</h2>
+<h3 id="71-tech-stack">7.1 Tech stack</h3>
+<table>
+<thead>
+<tr>
+<th>Concern</th>
+<th>Choice</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Framework</td>
+<td>React 18+ with Vite (fast dev/build)</td>
+</tr>
+<tr>
+<td>Language</td>
+<td>TypeScript</td>
+</tr>
+<tr>
+<td>Routing</td>
+<td>React Router v6</td>
+</tr>
+<tr>
+<td>State/data-fetching</td>
+<td>TanStack Query (server state) + Zustand or Redux Toolkit (client/UI state)</td>
+</tr>
+<tr>
+<td>Forms</td>
+<td>React Hook Form + Zod (schema validation)</td>
+</tr>
+<tr>
+<td>UI components</td>
+<td>Material UI (MUI) or Chakra UI / Tailwind + shadcn/ui</td>
+</tr>
+<tr>
+<td>File upload</td>
+<td>Native <code>fetch</code>/<code>axios</code> with presigned URL PUT + progress via <code>XMLHttpRequest</code>/axios <code>onUploadProgress</code></td>
+</tr>
+<tr>
+<td>PDF/image preview</td>
+<td><code>react-pdf</code> for PDFs, native <code>&lt;img&gt;</code> for images</td>
+</tr>
+<tr>
+<td>Auth token handling</td>
+<td>Axios interceptor with silent refresh; access token in memory (not localStorage) + httpOnly refresh cookie</td>
+</tr>
+<tr>
+<td>Testing</td>
+<td>Vitest + React Testing Library, Playwright/Cypress for E2E</td>
+</tr>
+</tbody>
+</table>
+<h3 id="72-folder-structure">7.2 Folder structure</h3>
+<div class="codehilite"><pre><span></span><code>medvault-frontend/
+├── index.html
+├── vite.config.ts
+├── src/
+│   ├── main.tsx
+│   ├── App.tsx
+│   ├── routes/
+│   │   ├── AppRouter.tsx
+│   │   └── ProtectedRoute.tsx
+│   │
+│   ├── api/
+│   │   ├── axiosClient.ts              # base axios instance + interceptors
+│   │   ├── authApi.ts
+│   │   ├── recordsApi.ts
+│   │   ├── profilesApi.ts
+│   │   ├── sharesApi.ts
+│   │   └── types.ts                    # shared API DTO types
+│   │
+│   ├── features/
+│   │   ├── auth/
+│   │   │   ├── pages/ (LoginPage, RegisterPage, VerifyEmailPage, ForgotPasswordPage)
+│   │   │   ├── components/ (LoginForm, RegisterForm)
+│   │   │   └── hooks/ (useAuth, useLogin, useRegister)
+│   │   │
+│   │   ├── dashboard/
+│   │   │   ├── pages/DashboardPage.tsx
+│   │   │   └── components/ (StorageUsageCard, RecentRecordsList, CategoryBreakdownChart)
+│   │   │
+│   │   ├── records/
+│   │   │   ├── pages/ (RecordsListPage, RecordDetailPage, UploadRecordPage)
+│   │   │   ├── components/ (RecordCard, RecordTable, RecordFilterBar, FileUploadDropzone, FilePreviewModal, TagInput)
+│   │   │   └── hooks/ (useRecords, useUploadRecord, useRecordDetail)
+│   │   │
+│   │   ├── profiles/
+│   │   │   ├── pages/ProfilesPage.tsx
+│   │   │   └── components/ProfileSwitcher.tsx
+│   │   │
+│   │   ├── sharing/
+│   │   │   ├── pages/ (SharesPage, PublicShareViewPage)
+│   │   │   └── components/ (ShareModal, ShareLinkList)
+│   │   │
+│   │   └── admin/
+│   │       ├── pages/ (AdminUsersPage, AdminAuditLogPage)
+│   │
+│   ├── components/                     # generic/shared UI: Button, Modal, Table, Pagination, Toast
+│   ├── layouts/                        # MainLayout (sidebar+header), AuthLayout, PublicLayout
+│   ├── hooks/                          # useDebounce, usePagination, usePermission
+│   ├── store/                          # Zustand slices: authStore, uiStore
+│   ├── theme/                          # MUI theme / Tailwind config
+│   ├── utils/                          # formatBytes, formatDate, fileTypeIcon
+│   └── constants/                      # categoryOptions, routes.ts
+│
+├── public/
+└── tests/
+</code></pre></div>
+
+<h3 id="73-core-ux-screens">7.3 Core UX screens</h3>
+<ol>
+<li><strong>Login/Register/Verify</strong> — simple forms with validation and clear error states.</li>
+<li><strong>Dashboard</strong> — storage usage bar, records-by-category chart, recent uploads, quick-upload button.</li>
+<li><strong>Records List</strong> — grid/list toggle, filters (category, date range, doctor, tags), search bar, bulk actions (share/delete).</li>
+<li><strong>Upload flow</strong> — drag-and-drop, multi-file, metadata form, progress bars per file, resumable-friendly (chunk if needed for large files).</li>
+<li><strong>Record Detail</strong> — inline preview (PDF viewer / image zoom), metadata panel, version/audit history, share button.</li>
+<li><strong>Share Management</strong> — list of active share links with expiry/revoke controls.</li>
+<li><strong>Profile Switcher</strong> — dropdown in header to switch between self/dependent profiles.</li>
+<li><strong>Admin panel</strong> (separate route guard) — user list, audit log viewer.</li>
+</ol>
+<h3 id="74-security-practices-on-frontend">7.4 Security practices on frontend</h3>
+<ul>
+<li>Store the <strong>access token in memory only</strong> (React context/Zustand), never in <code>localStorage</code>, to reduce XSS token-theft risk; refresh token lives in an httpOnly, secure, <code>SameSite=strict</code> cookie.</li>
+<li>Axios response interceptor: on 401, attempt silent <code>/auth/refresh</code> once, then retry original request; on repeat failure, log out.</li>
+<li>Sanitize any rendered user-supplied text (React escapes by default; avoid <code>dangerouslySetInnerHTML</code>).</li>
+<li>Enforce client-side file-type/size checks as a UX nicety — real enforcement is server-side.</li>
+<li>CSP headers configured at the hosting/CDN layer (see Security section).</li>
+</ul>
+<hr />
+<h2 id="8-minio-integration-details">8. MinIO Integration Details</h2>
+<h3 id="81-bucket-design">8.1 Bucket design</h3>
+<ul>
+<li>One bucket per environment: <code>medvault-prod</code>, <code>medvault-staging</code>.</li>
+<li>Object key convention: <code>{profileId}/{recordId}/{fileId}-{sanitizedFilename}</code>
+  This keeps a natural per-record grouping and avoids collisions.</li>
+<li>Enable <strong>versioning</strong> on the bucket so accidental overwrite/delete is recoverable.</li>
+<li>Enable <strong>server-side encryption</strong> (SSE-S3 or SSE-KMS if MinIO is configured with a KMS) so data at rest is encrypted transparently.</li>
+<li>Configure <strong>lifecycle rules</strong>: permanently purge objects tied to soft-deleted records after the retention window (e.g. 30 days) via a scheduled job that calls MinIO's remove API — do NOT rely solely on MinIO lifecycle rules since deletion must be tied to the DB record's <code>deleted_at</code> state, not just object age.</li>
+<li>Set a <strong>bucket policy</strong> so the bucket itself is private; all access happens through presigned URLs issued by the backend, never public reads.</li>
+</ul>
+<h3 id="82-presigned-url-flow-already-shown-in-sequence-diagrams">8.2 Presigned URL flow (already shown in sequence diagrams)</h3>
+<ul>
+<li><strong>Upload</strong>: backend calls <code>MinioClient.getPresignedObjectUrl(PUT, bucket, key, expiry=5min)</code> after validating file type/size/quota; frontend PUTs directly to MinIO.</li>
+<li><strong>Download/view</strong>: backend calls the same for <code>GET</code>, short expiry (e.g., 2–5 min), and only after verifying the requester owns/has-share-access to the record; every call is audit-logged.</li>
+<li>This keeps large binary traffic off the Spring Boot instances (they only issue short-lived signed URLs), which is critical for scaling.</li>
+</ul>
+<h3 id="83-virusmalware-scanning">8.3 Virus/malware scanning</h3>
+<ul>
+<li>Before marking an upload <code>ACTIVE</code>, optionally route the object through a <strong>ClamAV</strong> scan (via a sidecar/service subscribed to MinIO bucket notifications, or a synchronous scan step before generating the presigned URL confirmation). Flag/quarantine infected files instead of serving them.</li>
+</ul>
+<h3 id="84-minio-deployment">8.4 MinIO deployment</h3>
+<ul>
+<li>Dev: single-node MinIO via Docker Compose.</li>
+<li>Prod: MinIO in <strong>distributed mode</strong> (min. 4 nodes, erasure coding) for durability, or use a managed S3-compatible service if not self-hosting. The application code should depend only on the S3 API (via the MinIO SDK, which is S3-compatible), so switching to AWS S3 later is a config change, not a rewrite.</li>
+</ul>
+<hr />
+<h2 id="9-authentication-authorization">9. Authentication &amp; Authorization</h2>
+<h3 id="91-authentication">9.1 Authentication</h3>
+<ul>
+<li><strong>Primary</strong>: email + password (bcrypt/Argon2 hashed, never plain/reversible).</li>
+<li><strong>Tokens</strong>: JWT access token (short-lived, 15 min, signed RS256/HS256) + opaque refresh token (7–30 days, stored hashed in <code>refresh_tokens</code> table, rotated on each use, revocable).</li>
+<li><strong>Email verification</strong> required before first login-enabled use (OTP or link).</li>
+<li><strong>MFA (Phase 3)</strong>: TOTP (Google Authenticator-compatible) as an optional, then eventually mandatory, layer — sensitive medical data justifies pushing users toward MFA.</li>
+<li><strong>OAuth2 social login (optional)</strong>: Google login via Spring Security OAuth2 client, mapped to the same <code>users</code> table.</li>
+</ul>
+<h3 id="92-authorization-rbac-ownership">9.2 Authorization (RBAC + ownership)</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Capabilities</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PATIENT</td>
+<td>Full CRUD on own profiles/records; create shares</td>
+</tr>
+<tr>
+<td>DOCTOR (Phase 3)</td>
+<td>View records explicitly shared with their account</td>
+</tr>
+<tr>
+<td>ADMIN</td>
+<td>User management, audit log access, system monitoring — <strong>no direct access to patient files</strong> unless explicitly elevated for support with logged justification</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Enforce <strong>row-level ownership</strong>: every record/profile query is scoped by <code>profile.user_id = authenticatedUserId</code> (or valid share token) — implemented via the centralized <code>PermissionEvaluator</code> shown earlier, not per-controller ad hoc checks.</li>
+<li>Admin accounts should NOT have a blanket "view any file" capability by default — this is a deliberate privacy control; break-glass access (if ever needed) must be explicitly logged and time-boxed.</li>
+</ul>
+<h3 id="93-share-link-security">9.3 Share-link security</h3>
+<ul>
+<li>Token: cryptographically random, ≥128 bits, stored as the token itself (or its hash) with an expiry and <code>revoked</code> flag.</li>
+<li>Rate-limit share-token resolution endpoint to prevent brute-force guessing.</li>
+<li>Optional: require recipient email verification (OTP) before granting access, for stricter sharing.</li>
+</ul>
+<hr />
+<h2 id="10-security-considerations-cross-cutting">10. Security Considerations (Cross-Cutting)</h2>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Controls</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Transport</td>
+<td>TLS 1.2+ everywhere (browser↔LB, LB↔services, services↔MinIO/Postgres); HSTS</td>
+</tr>
+<tr>
+<td>Data at rest</td>
+<td>Postgres disk encryption (cloud provider or LUKS), MinIO SSE, encrypted backups</td>
+</tr>
+<tr>
+<td>App secrets</td>
+<td>Managed via Vault/AWS Secrets Manager/K8s Secrets — never in source control or plain <code>.env</code> in prod</td>
+</tr>
+<tr>
+<td>Passwords</td>
+<td>Argon2id or bcrypt (cost ≥ 12), password strength policy, breached-password check (e.g., HaveIBeenPwned API) optional</td>
+</tr>
+<tr>
+<td>Session/tokens</td>
+<td>Short-lived JWT, rotated refresh tokens, httpOnly+secure cookies, logout invalidates refresh token</td>
+</tr>
+<tr>
+<td>Input validation</td>
+<td>Bean Validation on backend DTOs; Zod schemas on frontend; strict file-type allow-list (<code>pdf, jpg, jpeg, png, docx</code>) and MIME-sniffing check (not just extension)</td>
+</tr>
+<tr>
+<td>File safety</td>
+<td>Virus scan before activation; block executable/script mime types; size cap (e.g., 25MB/file)</td>
+</tr>
+<tr>
+<td>Rate limiting</td>
+<td>Redis-backed limits on login, OTP, share-token resolution, upload-init endpoints (brute-force/DoS mitigation)</td>
+</tr>
+<tr>
+<td>Headers</td>
+<td>CSP, X-Frame-Options: DENY, X-Content-Type-Options: nosniff, Referrer-Policy</td>
+</tr>
+<tr>
+<td>CORS</td>
+<td>Explicit allow-list of frontend origins only</td>
+</tr>
+<tr>
+<td>Audit</td>
+<td>Append-only <code>audit_logs</code> for every access/share/delete; periodic export to immutable storage</td>
+</tr>
+<tr>
+<td>Data isolation</td>
+<td>Strict per-user/profile scoping at the query layer; automated tests for cross-tenant access attempts</td>
+</tr>
+<tr>
+<td>Compliance-readiness</td>
+<td>Data export ("download all my data") and account/data deletion workflows built in from day one (GDPR-style); document data retention policy</td>
+</tr>
+<tr>
+<td>Dependency hygiene</td>
+<td>Automated dependency/vulnerability scanning (Dependabot/Snyk/OWASP Dependency-Check) in CI</td>
+</tr>
+<tr>
+<td>Pen testing</td>
+<td>Plan a third-party security review before public launch given the sensitivity of medical data</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="11-additional-components-for-a-production-ready-system">11. Additional Components for a Production-Ready System</h2>
+<table>
+<thead>
+<tr>
+<th>Concern</th>
+<th>Recommendation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Containerization</td>
+<td>Docker for every service; multi-stage builds to keep images small</td>
+</tr>
+<tr>
+<td>Orchestration</td>
+<td>Docker Compose for local/dev; Kubernetes (or ECS) for staging/prod</td>
+</tr>
+<tr>
+<td>CI/CD</td>
+<td>GitHub Actions/GitLab CI: lint → test → build → scan image → push → deploy (blue-green or rolling)</td>
+</tr>
+<tr>
+<td>Config management</td>
+<td>Spring <code>application-{profile}.yml</code> + externalized secrets; 12-factor config via env vars</td>
+</tr>
+<tr>
+<td>DB migrations</td>
+<td>Flyway, versioned, run automatically at deploy time (never manual schema edits in prod)</td>
+</tr>
+<tr>
+<td>Logging</td>
+<td>Structured JSON logs (Logback + Logstash encoder) → shipped to ELK/Loki</td>
+</tr>
+<tr>
+<td>Metrics</td>
+<td>Micrometer + Prometheus, Grafana dashboards (request latency, error rate, upload throughput, storage usage)</td>
+</tr>
+<tr>
+<td>Tracing</td>
+<td>OpenTelemetry + Jaeger/Tempo for distributed tracing once services split</td>
+</tr>
+<tr>
+<td>Alerting</td>
+<td>Alertmanager/Grafana alerts on error-rate spikes, disk usage, failed logins spike</td>
+</tr>
+<tr>
+<td>Backups</td>
+<td>Automated nightly Postgres backups (pg_dump/WAL-based, e.g. pgBackRest) + MinIO bucket replication/versioning; periodic restore drills</td>
+</tr>
+<tr>
+<td>Email/SMS</td>
+<td>Transactional email via SES/SendGrid/Postmark; SMS via Twilio (OTP, reminders)</td>
+</tr>
+<tr>
+<td>Search (Phase 2)</td>
+<td>Elasticsearch/OpenSearch for OCR full-text search across scanned documents</td>
+</tr>
+<tr>
+<td>OCR (Phase 2)</td>
+<td>Tesseract or a managed OCR API to extract text from scanned PDFs/images for search &amp; tagging suggestions</td>
+</tr>
+<tr>
+<td>Load testing</td>
+<td>k6/Gatling before major launches</td>
+</tr>
+<tr>
+<td>API documentation</td>
+<td>Auto-generated via springdoc-openapi, published for any future doctor/partner integrations</td>
+</tr>
+<tr>
+<td>Disaster recovery</td>
+<td>Documented RTO/RPO targets; multi-AZ deployment for DB and MinIO in prod</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="12-deployment-architecture">12. Deployment Architecture</h2>
+<h3 id="121-environments">12.1 Environments</h3>
+<ul>
+<li><strong>Local dev</strong>: Docker Compose spinning up Postgres, MinIO, Redis, backend (hot-reload), frontend (Vite dev server).</li>
+<li><strong>Staging</strong>: mirrors prod topology at smaller scale, used for QA/UAT.</li>
+<li><strong>Production</strong>: Kubernetes cluster (or managed alternative) as below.</li>
+</ul>
+<h3 id="122-docker-compose-local-dev-conceptual">12.2 Docker Compose (local dev) — conceptual</h3>
+<div class="codehilite"><pre><span></span><code><span class="nt">services</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">postgres</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">postgres:16</span>
+<span class="w">    </span><span class="nt">environment</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">POSTGRES_DB</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">medvault</span>
+<span class="w">      </span><span class="nt">POSTGRES_USER</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">medvault</span>
+<span class="w">      </span><span class="nt">POSTGRES_PASSWORD</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${DB_PASSWORD}</span>
+<span class="w">    </span><span class="nt">volumes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">pgdata</span><span class="p p-Indicator">:</span><span class="nv">/var/lib/postgresql/data</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">ports</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;5432:5432&quot;</span><span class="p p-Indicator">]</span>
+
+<span class="w">  </span><span class="nt">minio</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">minio/minio</span>
+<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server /data --console-address &quot;:9001&quot;</span>
+<span class="w">    </span><span class="nt">environment</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">MINIO_ROOT_USER</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${MINIO_ROOT_USER}</span>
+<span class="w">      </span><span class="nt">MINIO_ROOT_PASSWORD</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${MINIO_ROOT_PASSWORD}</span>
+<span class="w">    </span><span class="nt">volumes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">miniodata</span><span class="p p-Indicator">:</span><span class="nv">/data</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">ports</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;9000:9000&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;9001:9001&quot;</span><span class="p p-Indicator">]</span>
+
+<span class="w">  </span><span class="nt">redis</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">redis:7</span>
+<span class="w">    </span><span class="nt">ports</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;6379:6379&quot;</span><span class="p p-Indicator">]</span>
+
+<span class="w">  </span><span class="nt">backend</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">build</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./medvault-backend</span>
+<span class="w">    </span><span class="nt">env_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.env</span>
+<span class="w">    </span><span class="nt">depends_on</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">postgres</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">minio</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">redis</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">ports</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;8080:8080&quot;</span><span class="p p-Indicator">]</span>
+
+<span class="w">  </span><span class="nt">frontend</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">build</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./medvault-frontend</span>
+<span class="w">    </span><span class="nt">ports</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;5173:5173&quot;</span><span class="p p-Indicator">]</span>
+
+<span class="nt">volumes</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">pgdata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">miniodata</span><span class="p">:</span>
+</code></pre></div>
+
+<h3 id="123-production-topology-kubernetes-conceptual">12.3 Production topology (Kubernetes, conceptual)</h3>
+<div class="mermaid">
+flowchart LR
+    subgraph Internet
+        U[Users]
+    end
+    U --> ING[Ingress / Nginx + cert-manager TLS]
+    ING --> FE[Frontend static build<br/>served via CDN or Nginx pod]
+    ING --> BE[Backend Deployment<br/>3+ replicas, HPA]
+    BE --> PGPRIMARY[(Postgres Primary<br/>Managed RDS/CloudSQL or self-hosted HA)]
+    PGPRIMARY --> PGREPLICA[(Read Replica)]
+    BE --> REDISCLUSTER[(Redis)]
+    BE --> MINIOCLUSTER[(MinIO Distributed<br/>4+ nodes, erasure coding)]
+    BE --> SECRETS[K8s Secrets / Vault]
+    subgraph Observability
+        PROM[Prometheus]
+        GRAF[Grafana]
+        LOKI[Loki/ELK]
+    end
+    BE --> PROM
+    BE --> LOKI
+
+</div>
+<ul>
+<li><strong>Backend</strong>: Deployment with 3+ replicas, <code>HorizontalPodAutoscaler</code> on CPU/latency, liveness/readiness probes hitting Spring Boot Actuator endpoints.</li>
+<li><strong>Frontend</strong>: build as static assets, served via a CDN (CloudFront/Cloudflare) or a lightweight Nginx pod — no server-side rendering needed for this app.</li>
+<li><strong>Database</strong>: prefer a managed Postgres (RDS/Cloud SQL) in prod for automated failover/backups; self-hosted HA (Patroni) if fully self-hosted.</li>
+<li><strong>MinIO</strong>: distributed mode across ≥4 nodes/pods with persistent volumes, or swap for managed S3.</li>
+<li><strong>CI/CD pipeline</strong> (example, GitHub Actions):
+  1. On PR: lint, unit tests, <code>mvn verify</code> (with Testcontainers), frontend <code>vitest</code>/build.
+  2. On merge to <code>main</code>: build Docker images, scan (Trivy/Grype), push to registry, run Flyway migration job, deploy to staging, run smoke tests.
+  3. Manual approval → promote same image to production (rolling update).</li>
+</ul>
+<hr />
+<h2 id="13-suggested-build-roadmap">13. Suggested Build Roadmap</h2>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Duration (indicative)</th>
+<th>Deliverables</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0. Setup</td>
+<td>1–2 wks</td>
+<td>Repo structure, CI skeleton, Docker Compose dev env, DB schema v1, auth scaffolding</td>
+</tr>
+<tr>
+<td>1. MVP</td>
+<td>4–6 wks</td>
+<td>Register/login, upload/list/view/download/delete records, categories/tags, dashboard, audit logging</td>
+</tr>
+<tr>
+<td>2. Sharing &amp; Profiles</td>
+<td>3–4 wks</td>
+<td>Share links, multi-profile (dependents), notifications, quotas UI</td>
+</tr>
+<tr>
+<td>3. Search &amp; OCR</td>
+<td>3–4 wks</td>
+<td>Elasticsearch integration, OCR pipeline, smarter tagging suggestions</td>
+</tr>
+<tr>
+<td>4. Doctor Portal &amp; Hardening</td>
+<td>4–6 wks</td>
+<td>Doctor role/view, MFA, pen test remediation, load testing, prod hardening</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="14-summary-of-key-recommendations">14. Summary of Key Recommendations</h2>
+<ol>
+<li>Start as a <strong>modular monolith</strong> in Spring Boot — faster to build and operate than microservices at this stage; package boundaries make future extraction easy.</li>
+<li>Keep <strong>file bytes in MinIO, metadata in Postgres</strong>, always via <strong>presigned URLs</strong> — never proxy large files through the app server.</li>
+<li>Treat this as <strong>sensitive health data from day one</strong>: append-only audit logs, strict row-level ownership checks, encryption everywhere, no implicit admin file access.</li>
+<li>Use <strong>JWT access + rotated refresh tokens</strong>, access token in memory on the frontend, refresh token in an httpOnly cookie.</li>
+<li>Design the storage abstraction against the <strong>S3 API</strong> so MinIO can be swapped for AWS S3/GCS later without code changes.</li>
+<li>Build <strong>data export/delete</strong> capabilities early — much cheaper than retrofitting for compliance later.</li>
+<li>Automate <strong>migrations (Flyway), backups, and observability</strong> before go-live, not after.</li>
+</ol>
+<hr />
+<p><em>Note: This document is a technical/product plan generated to help scope and design the system. It is not a substitute for a formal legal/compliance review (HIPAA, GDPR, or local health-data regulations) before handling real patient data in production — engage legal/compliance counsel for that certification process.</em></p>
+<hr />
+<h2 id="15-legal-compliance-and-go-live-readiness">15. Legal, Compliance &amp; Go-Live Readiness</h2>
+<p>This section turns the compliance note above into an implementation workstream. It is a planning checklist, not a legal opinion or certification. Before production use, counsel and qualified privacy/security professionals must confirm which laws apply, who is responsible for compliance, and whether the proposed controls satisfy the applicable obligations.</p>
+
+<h3>15.1 Establish the regulatory scope</h3>
+<p>Create a written data and jurisdiction inventory before collecting real health information. The applicable obligations depend on where the patient, provider, organization, and infrastructure are located, and on the role MedVault plays in each workflow.</p>
+<table>
+<thead><tr><th>Area</th><th>Questions to answer</th><th>Required output</th></tr></thead>
+<tbody>
+<tr><td>Jurisdictions</td><td>Which countries, states, or regions can users and clinicians access from? Where are users, support staff, databases, backups, and object storage located?</td><td>Jurisdiction matrix and approved hosting regions</td></tr>
+<tr><td>Business role</td><td>Is MedVault a controller, processor, covered entity, business associate, health information custodian, or another regulated role for each customer and workflow?</td><td>Role and responsibility matrix</td></tr>
+<tr><td>Data types</td><td>Which fields, documents, images, identifiers, diagnostic details, insurance data, payment data, and dependent records are collected?</td><td>Data classification and processing inventory</td></tr>
+<tr><td>People and access</td><td>Who can create, view, download, share, administer, support, or delete records? Are minors, dependents, representatives, or emergency access included?</td><td>Actor, purpose, and access matrix</td></tr>
+</tbody>
+</table>
+
+<h3>15.2 Assign accountability and obtain approvals</h3>
+<ul>
+<li>Assign an executive owner, product owner, security owner, privacy owner, and incident commander.</li>
+<li>Document the customer organization&apos;s responsibilities separately from MedVault&apos;s responsibilities.</li>
+<li>Identify whether a Data Protection Officer, privacy officer, security officer, or local representative is required.</li>
+<li>Define the process for legal review of new features, new data types, new countries, and new vendors.</li>
+<li>Obtain written approval for the privacy notice, consent language where required, terms of service, records policy, and support access policy.</li>
+<li>Do not use real patient data for development, demonstrations, test fixtures, or screenshots unless specifically approved and protected for that purpose.</li>
+</ul>
+
+<h3>15.3 Privacy engineering requirements</h3>
+<ul>
+<li>Collect only the minimum data required for a documented product purpose.</li>
+<li>Make each processing purpose explicit and document the lawful basis or other required justification with counsel.</li>
+<li>Separate account identity data, clinical records, audit data, analytics, and support data where practical.</li>
+<li>Provide clear notices explaining collection, use, sharing, storage locations, retention, rights, and contact channels.</li>
+<li>Use privacy-preserving defaults: private records, disabled public links, minimal profile visibility, and no sensitive data in URLs or notifications.</li>
+<li>Complete a privacy impact assessment or equivalent risk assessment before production launch and whenever the processing materially changes.</li>
+<li>Define whether product analytics, error tracking, email providers, OCR services, AI services, and customer support tools may receive health data. Default to no health data.</li>
+</ul>
+
+<h3>15.4 HIPAA and healthcare-contract readiness</h3>
+<p>Where HIPAA applies, counsel must determine the covered-entity and business-associate relationships and the required contract terms. The implementation should support, at minimum:</p>
+<ul>
+<li>Business Associate Agreements where required, including permitted uses, safeguards, subcontractors, breach reporting, return or destruction, and audit cooperation.</li>
+<li>Administrative, physical, and technical safeguard documentation tied to the HIPAA Security Rule and the organization&apos;s risk analysis.</li>
+<li>Individual access, amendment, accounting, and restriction workflows where applicable to the customer&apos;s obligations.</li>
+<li>Minimum-necessary access, unique user identification, emergency access procedures, automatic session controls, and audit review.</li>
+<li>A documented breach assessment and notification process with named owners and regulatory deadlines verified by counsel.</li>
+</ul>
+
+<h3>15.5 GDPR and regional privacy readiness</h3>
+<p>Where GDPR or similar privacy law applies, counsel should confirm roles, lawful bases, special-category data requirements, international-transfer mechanisms, and the applicable representative or authority obligations. The product should provide:</p>
+<ul>
+<li>Data-subject request workflows for access, correction, deletion, restriction, portability, and objection when applicable.</li>
+<li>Identity verification and authorization checks before releasing or changing a person&apos;s records.</li>
+<li>Request tracking with intake date, scope, identity evidence, decisions, exports, exceptions, and completion date.</li>
+<li>Mechanisms to find all copies, derivatives, indexes, thumbnails, exports, backups, and shared links associated with a record.</li>
+<li>Documented retention exceptions where deletion is restricted by law, clinical obligations, litigation hold, accounting rules, or customer policy.</li>
+<li>Transfer assessments and approved safeguards for vendors or infrastructure outside the relevant jurisdiction.</li>
+</ul>
+
+<h3>15.6 Security controls required before real data</h3>
+<ul>
+<li>Enforce MFA for administrators and privileged users; require it for all users when the risk assessment supports that decision.</li>
+<li>Use least privilege, tenant isolation, resource-level authorization, and server-side checks for every read, download, share, update, and delete operation.</li>
+<li>Encrypt data in transit and at rest, manage keys separately, rotate secrets, and document key recovery and revocation procedures.</li>
+<li>Keep audit events append-only and tamper-evident, including actor, subject, action, timestamp, result, source, and correlation identifier.</li>
+<li>Redact health data, tokens, passwords, and encryption material from application logs, traces, crash reports, notifications, and analytics.</li>
+<li>Scan uploads for malware, validate file type and size, prevent path traversal, and isolate document preview or OCR processing.</li>
+<li>Apply secure session handling, rate limits, brute-force protection, CSRF protection where applicable, secure headers, and dependency patching.</li>
+<li>Complete independent penetration testing, remediation tracking, vulnerability scanning, backup restoration testing, and disaster-recovery testing.</li>
+</ul>
+
+<h3>15.7 Retention, deletion, and legal hold</h3>
+<p>Retention must be policy-driven rather than implemented as an arbitrary timeout. For each record category, define the retention owner, minimum and maximum period, deletion trigger, legal hold behavior, backup treatment, and verification evidence.</p>
+<table>
+<thead><tr><th>Record category</th><th>Policy decisions</th><th>Technical behavior</th></tr></thead>
+<tbody>
+<tr><td>Clinical documents</td><td>Required retention period, patient request rules, clinical or legal exceptions</td><td>Versioned deletion workflow, object deletion, metadata cleanup, and deletion audit event</td></tr>
+<tr><td>Account and identity data</td><td>When inactive accounts and identity evidence may be removed</td><td>Account closure workflow with dependency checks and confirmation</td></tr>
+<tr><td>Audit records</td><td>Required duration, immutability, access restrictions, and export process</td><td>Append-only storage with restricted administrative access</td></tr>
+<tr><td>Backups and replicas</td><td>Expiration, restore handling, legal holds, and deletion verification</td><td>Documented lifecycle rules and periodic restoration tests</td></tr>
+</tbody>
+</table>
+
+<h3>15.8 Vendors, subprocessors, and contracts</h3>
+<ul>
+<li>Maintain a live vendor register for hosting, object storage, email, SMS, OCR, search, monitoring, support, authentication, and payment services.</li>
+<li>Record each vendor&apos;s data access, storage region, subprocessors, security documentation, incident contact, retention behavior, and deletion guarantees.</li>
+<li>Complete security and privacy due diligence before enabling a vendor with health-data access.</li>
+<li>Execute required Data Processing Agreements, Business Associate Agreements, confidentiality terms, security addenda, and transfer terms.</li>
+<li>Provide customer notice and an objection or approval process for material subprocessor changes where required.</li>
+<li>Ensure contracts address breach notification timing, cooperation, audit rights, return or deletion, business continuity, and termination assistance.</li>
+</ul>
+
+<h3>15.9 Incident response and breach readiness</h3>
+<ol>
+<li><strong>Detect:</strong> Alert on suspicious login activity, privilege changes, bulk downloads, unusual sharing, malware, failed authorization, and data exfiltration signals.</li>
+<li><strong>Contain:</strong> Revoke sessions and tokens, disable affected accounts or links, isolate workloads, preserve evidence, and protect unaffected tenants.</li>
+<li><strong>Assess:</strong> Determine what data, people, systems, and jurisdictions are affected, when exposure began, and whether the event is reportable.</li>
+<li><strong>Notify:</strong> Follow approved contractual, regulatory, and customer notification procedures after counsel confirms the content and timing.</li>
+<li><strong>Recover:</strong> Remove persistence, restore from verified backups, rotate credentials, validate controls, and monitor for recurrence.</li>
+<li><strong>Learn:</strong> Complete a post-incident review, document corrective actions, assign owners and deadlines, and test the updated response plan.</li>
+</ol>
+
+<h3>15.10 Required compliance evidence</h3>
+<p>Store versioned evidence in a restricted compliance repository. A production approval package should include:</p>
+<ul>
+<li>Approved data inventory, system and data-flow diagrams, risk assessment, privacy impact assessment, and jurisdiction matrix.</li>
+<li>Access-control matrix, role reviews, MFA coverage, privileged-access approvals, and sample audit-log reviews.</li>
+<li>Security architecture, encryption and key-management design, vulnerability reports, penetration-test results, and remediation decisions.</li>
+<li>Retention schedule, deletion test results, backup restoration results, disaster-recovery results, and legal-hold procedure.</li>
+<li>Vendor register, security reviews, contracts, subprocessor list, hosting-region confirmation, and transfer assessments.</li>
+<li>Privacy notices, terms, consent records where applicable, request-handling procedure, incident-response plan, and training records.</li>
+<li>Release approval signed by product, security, privacy, operations, and legal/compliance owners.</li>
+</ul>
+
+<h3>15.11 Suggested compliance delivery phases</h3>
+<table>
+<thead><tr><th>Phase</th><th>Focus</th><th>Exit criteria</th></tr></thead>
+<tbody>
+<tr><td>Discovery</td><td>Jurisdictions, roles, data inventory, processing purposes, risk classification</td><td>Approved scope and named accountable owners</td></tr>
+<tr><td>Design</td><td>Privacy impact assessment, threat model, access model, retention, vendor review</td><td>Architecture and policies approved for implementation</td></tr>
+<tr><td>Build</td><td>Controls, rights workflows, audit evidence, deletion, incident tooling, documentation</td><td>Security and privacy acceptance tests pass</td></tr>
+<tr><td>Verify</td><td>Pen test, restore test, access review, tabletop incident exercise, request simulation</td><td>Critical findings closed or formally accepted</td></tr>
+<tr><td>Launch</td><td>Contracts, notices, training, monitoring, support runbooks, approval package</td><td>Written go-live approval and rollback plan</td></tr>
+<tr><td>Operate</td><td>Periodic reviews, risk updates, vendor monitoring, training, audits, and improvements</td><td>Recurring compliance calendar is active and owned</td></tr>
+</tbody>
+</table>
+
+<h3>15.12 Go-live decision</h3>
+<p>Do not enable real patient data until the accountable owners can answer yes to all of the following: the legal role and jurisdictions are confirmed; required contracts and notices are approved; access and tenant isolation are tested; audit, deletion, export, and incident workflows are operational; backups and recovery are verified; vendors are reviewed; staff are trained; and unresolved risks have written acceptance from the authorized decision-maker.</p>
+    <footer class="doc-footer">
+      Generated planning document — not a substitute for formal legal/compliance review (HIPAA, GDPR, or local health-data regulations) before handling real patient data in production.
+    </footer>
+  </main>
+</div>
+<script>
+  mermaid.initialize({ startOnLoad: true, theme: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default', securityLevel: 'loose', flowchart: { useMaxWidth: true }, er: { useMaxWidth: true } });
+</script>
+</body>
+</html>
